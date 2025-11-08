@@ -1,0 +1,31 @@
+name: build
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: KSPModdingLibs/KSPBuildTools/.github/actions/setup-ckan@0.0.4
+      - uses: KSPModdingLibs/KSPBuildTools/.github/actions/install-dependencies@0.0.4
+        with:
+          dependency-identifiers: Harmony2
+
+      - uses: KSPModdingLibs/KSPBuildTools/.github/actions/compile@0.0.4
+      - uses: KSPModdingLibs/KSPBuildTools/.github/actions/assemble-release@0.0.4
+        with:
+          output-file-name: HUDReplacer.zip
+          # The build step already copies the relevant files into GameData so we
+          # don't need to include the defaults here
+          artifacts: GameData
+
+      - uses: actions/upload-artifact@v4
+        with:
+          path: GameData\HUDReplacer\HUDReplacer.version
+          name: HUDReplacer.version
