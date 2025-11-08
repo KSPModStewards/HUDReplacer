@@ -5,6 +5,9 @@ on:
     types: 
       - published
 
+env:
+  GITHUB_TOKEN: ${{ github.token }}
+
 jobs:
   build:
     uses: ./.github/workflows/build.yml
