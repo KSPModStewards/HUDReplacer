@@ -14,7 +14,7 @@
 
     <ItemGroup>
         <KSPVersionFile Include=".">
-            <Destination>$(ProjectRootDir)\GameData\HUDReplacer\HUDReplacer.version</Destination>
+            <Destination>$(RepoRootPath)\GameData\HUDReplacer\HUDReplacer.version</Destination>
             <URL>https://github.com/KSPModStewards/HUDReplacer/releases/latest/download/HUDReplacer.version</URL>
             <Download>https//github.com/KSPModStewards/HUDReplacer/releases</Download>
         </KSPVersionFile>
