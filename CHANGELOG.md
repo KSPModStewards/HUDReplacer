@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Fixed
+* Fixed a bug where a replacement with an explicitly specified size would not
+  be selected if it didn't match the size of the texture it was replacing.
+
+### Added
+* If the debug menu is enabled HUDReplacer will now log exactly what texture
+  replacements are occurred.
 
 ## 1.3.1
 ### Changed
