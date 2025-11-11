@@ -314,6 +314,7 @@ namespace HUDReplacer
 			if (!SceneImages.TryGetValue(HighLogic.LoadedScene, out var sceneImages))
 				sceneImages = Empty;
 
+			var basePath = KSPUtil.ApplicationRootPath;
 			foreach (Texture2D tex in tex_array)
 			{
 				string name = tex.name;
@@ -328,6 +329,15 @@ namespace HUDReplacer
 				var replacement = GetMatchingReplacement(info, sceneInfo, tex);
 				if (replacement is null)
 					continue;
+
+				if (SettingsManager.Instance.showDebugToolbar)
+				{
+					var path = replacement.path;
+					if (path.StartsWith(basePath))
+						path = path.Substring(basePath.Length);
+
+					Debug.Log($"HUDReplacer: Replacing texture {name} with {path}");
+				}
 
 				// Special handling for the mouse cursor
 				int cidx = CursorNames.IndexOf(name);
