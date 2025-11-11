@@ -43,7 +43,7 @@ namespace HUDReplacer
 					return null;
 
 				var sized = GetSizedReplacement(tex);
-				var unsized = GetUnsizedReplacement(tex);
+				var unsized = GetUnsizedReplacement();
 
 				if (sized is not null)
 				{
@@ -66,7 +66,7 @@ namespace HUDReplacer
 				return null;
 			}
 
-			SizedReplacementInfo GetUnsizedReplacement(Texture2D tex)
+			SizedReplacementInfo GetUnsizedReplacement()
 			{
 				SizedReplacementInfo found = replacements[0];
 
