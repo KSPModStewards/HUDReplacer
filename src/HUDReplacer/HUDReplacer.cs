@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -41,30 +42,53 @@ namespace HUDReplacer
 				if (replacements.Count == 0)
 					return null;
 
-				SizedReplacementInfo replacement = null;
+				var sized = GetSizedReplacement(tex);
+				var unsized = GetUnsizedReplacement(tex);
 
-				// Try to find a texture replacement with matching dimensions.
+				if (sized is not null)
+				{
+					// If priorities are equal then prefer the sized texture
+					if (unsized.priority <= sized.priority)
+						return sized;
+				}
+
+				return unsized;
+			}
+
+			SizedReplacementInfo GetSizedReplacement(Texture2D tex)
+			{
 				foreach (var info in replacements)
 				{
 					if (info.width == tex.width && info.height == tex.height)
-					{
-						replacement = info;
-						break;
-					}
+						return info;
 				}
 
-				var unsized = replacements[0];
+				return null;
+			}
 
-				// If no matching sized replacements just return the highest
-				// priority replacement.
-				if (replacement is null)
-					return unsized;
+			SizedReplacementInfo GetUnsizedReplacement(Texture2D tex)
+			{
+				SizedReplacementInfo found = replacements[0];
 
-				// Prefer the wrong-sized texture if it is higher priority, but
-				// otherwise use the replacement.
-				if (unsized.priority > replacement.priority)
-					return unsized;
-				return replacement;
+				foreach (var info in replacements)
+				{
+					if (info.priority < found.priority)
+						break;
+					
+					// Prefer textures without a specific size if we have one
+					// available.
+					if (info.width == 0 && info.height == 0)
+					{
+						found = info;
+						break;
+					}
+
+					// Otherwise use the biggest texture we have
+					if (info.width > found.width && info.height > found.height)
+						found = info;
+				}
+
+				return found;
 			}
 		}
 
