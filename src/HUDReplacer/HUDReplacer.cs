@@ -242,12 +242,17 @@ namespace HUDReplacer
 					continue;
 				}
 
+				var basePath = KSPUtil.ApplicationRootPath;
 				Debug.Log($"HUDReplacer: path {filePath} - priority: {priority}");
 				string[] files = Directory.GetFiles(KSPUtil.ApplicationRootPath + filePath, "*.png");
 
 				foreach (string filename in files)
 				{
-					Debug.Log($"HUDReplacer: Found file {filename}");
+					var relpath = filename;
+					if (relpath.StartsWith(basePath))
+						relpath = relpath.Substring(basePath.Length);
+
+					Debug.Log($"HUDReplacer: Found file {relpath}");
 
 					int width = 0;
 					int height = 0;
