@@ -38,16 +38,33 @@ namespace HUDReplacer
 
 			public SizedReplacementInfo GetMatchingReplacement(Texture2D tex)
 			{
+				if (replacements.Count == 0)
+					return null;
+
+				SizedReplacementInfo replacement = null;
+
+				// Try to find a texture replacement with matching dimensions.
 				foreach (var info in replacements)
 				{
-					if (info.width == 0 && info.height == 0)
-						return info;
-
 					if (info.width == tex.width && info.height == tex.height)
-						return info;
+					{
+						replacement = info;
+						break;
+					}
 				}
 
-				return null;
+				var unsized = replacements[0];
+
+				// If no matching sized replacements just return the highest
+				// priority replacement.
+				if (replacement is null)
+					return unsized;
+
+				// Prefer the wrong-sized texture if it is higher priority, but
+				// otherwise use the replacement.
+				if (unsized.priority > replacement.priority)
+					return unsized;
+				return replacement;
 			}
 		}
 
