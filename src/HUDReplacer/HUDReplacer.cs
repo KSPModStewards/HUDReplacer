@@ -315,6 +315,15 @@ namespace HUDReplacer
 						replacements.Add(basename, replacement);
 					}
 
+					// We will never select a replacement with a priority lower
+					// than the highest priority, so don't bother adding it to
+					// the list.
+					if (replacement.replacements.Count != 0)
+					{
+						if (info.priority < replacement.replacements[0].priority)
+							continue;
+					}
+
 					replacement.replacements.Add(info);
 				}
 			}
