@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+## Fixed
+* Fixed a bug where HUDReplacer would not replace any textures if there were
+  zero scene-specific replacements or zero general replacements.
+
 ## 1.3.2
 ### Fixed
 * Fixed a bug where a replacement with an explicitly specified size would not
