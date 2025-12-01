@@ -121,12 +121,9 @@ public partial class HUDReplacer : MonoBehaviour
         if (Images is null)
             LoadTextures();
 
-        if (Images.Count != 0 && SceneImages.Count != 0)
-        {
-            Debug.Log("HUDReplacer: Replacing textures...");
-            ReplaceTextures();
-            Debug.Log("HUDReplacer: Textures have been replaced!");
-        }
+        Debug.Log("HUDReplacer: Replacing textures...");
+        ReplaceTextures();
+        Debug.Log("HUDReplacer: Textures have been replaced!");
 
         LoadHUDColors();
     }
