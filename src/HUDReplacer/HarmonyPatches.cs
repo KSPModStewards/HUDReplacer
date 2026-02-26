@@ -46,6 +46,50 @@ public class HarmonyPatches : MonoBehaviour
         }
     }
 
+    [HarmonyPatch(typeof(UISkinManager), nameof(UISkinManager.GetSkin), new Type[] { typeof(string) })]
+    class Patch_UISkinManager_GetSkin
+    {
+        static void Postfix(UISkinDef __result)
+        {
+            if (HUDReplacer.Instance != null && __result != null)
+            {
+                HUDReplacer.Instance.ApplyUISkinDef(__result);
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(Graphic), "OnEnable")]
+    class Patch_Graphic_OnEnable
+    {
+        static void Postfix(Graphic __instance)
+        {
+            if (HUDReplacer.Instance == null)
+                return;
+
+            if (__instance is Image img)
+            {
+                Texture2D tex = null;
+                if (img.sprite != null && img.sprite.texture != null)
+                    tex = img.sprite.texture;
+                else if (img.mainTexture is Texture2D mTex)
+                    tex = mTex;
+
+                if (tex != null)
+                {
+                    HUDReplacer.Instance.ReplaceTextures(new Texture2D[] { tex });
+                }
+            }
+            else if (__instance is RawImage rawImg)
+            {
+                if (rawImg.texture is Texture2D tex)
+                {
+                    HUDReplacer.Instance.ReplaceTextures(new Texture2D[] { tex });
+                }
+            }
+        }
+    }
+
+
     [HarmonyPatch(typeof(StageTumbler), "Awake")]
     class Patch1_2
     {
@@ -241,7 +285,7 @@ public class HarmonyPatches : MonoBehaviour
             }
             Texture2D[] tex_array = textures.ToArray();
             if (tex_array.Length > 0)
-                HUDReplacer.instance.ReplaceTextures(tex_array);
+                HUDReplacer.Instance.ReplaceTextures(tex_array);
         }
     }
 
@@ -835,6 +879,43 @@ public class HarmonyPatches : MonoBehaviour
     internal static Color EditorCategoryButtonColor_Subassembly_color;
     internal static Color EditorCategoryButtonColor_Variants_color;
     internal static Color EditorCategoryButtonColor_Custom_color;
+
+    [HarmonyPatch(typeof(KSP.UI.UIMasterController), "Awake")]
+    class Patch_UIMasterController_Awake
+    {
+        static void Postfix()
+        {
+            if (HUDReplacer.Instance != null)
+            {
+                HUDReplacer.Instance.RefreshAll();
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(KSP.UI.Screens.ApplicationLauncher), "Awake")]
+    class Patch_ApplicationLauncher_Awake
+    {
+        static void Postfix()
+        {
+            if (HUDReplacer.Instance != null)
+            {
+                HUDReplacer.Instance.RefreshAll();
+            }
+        }
+    }
+
+
+    [HarmonyPatch(typeof(MainMenu), "Start")]
+    class Patch_MainMenu_Start
+    {
+        static void Postfix()
+        {
+            if (HUDReplacer.Instance != null)
+            {
+                HUDReplacer.Instance.RunMainMenuRefreshSequence();
+            }
+        }
+    }
 
     [HarmonyPatch(typeof(PartCategorizer), "Setup")]
     class Patch17
