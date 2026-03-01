@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+## 1.4.0
+### Added
+* The debug tools have been completely rewritten to be a bit more user-friendly.
+  You can still use the original shortcuts for cases where a UI window would not
+  be visible.
+
+### Changed
+* Replacement textures are now loaded up front, instead of during the scene load.
+* The point at which textures are replaced has been moved somewhat later. It now
+  happens during `onLevelWasLoadedGUIReady` instead of `HUDReplacer.Awake`.
+  This will mean that you can replace more textures than before.
+
+### Fixed
+* HUDReplacer now correctly replaces textures for windows using imgui/OnGUI.
+
 ## 1.3.3
 ### Fixed
 * Fixed a bug where HUDReplacer would not replace any textures if there were
