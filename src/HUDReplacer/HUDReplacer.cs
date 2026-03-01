@@ -24,6 +24,17 @@ public class HUDReplacer : MonoBehaviour
     static readonly Dictionary<string, ReplacementInfo> Empty = [];
     static readonly string[] CursorNames = ["basicNeutral", "basicElectricLime", "basicDisabled"];
 
+    // csharpier-ignore
+    static readonly byte[] WhitePixelPNG =
+    [
+        0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D,
+        0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+        0x08, 0x02, 0x00, 0x00, 0x00, 0x90, 0x77, 0x53, 0xDE, 0x00, 0x00, 0x00,
+        0x0B, 0x49, 0x44, 0x41, 0x54, 0x08, 0x5B, 0x63, 0xF8, 0x0F, 0x04, 0x00,
+        0x09, 0xFB, 0x03, 0xFD, 0x9F, 0x1F, 0x2C, 0x00, 0x00, 0x00, 0x00, 0x49,
+        0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82
+    ];
+
     // These track what has already been replaced so we don't modify it again
     static readonly HashSet<int> ReplacedIds = [];
 
@@ -244,10 +255,13 @@ public class HUDReplacer : MonoBehaviour
         {
             NavBall_Start.GaugeThrottleFilePath = replacement.path;
         }
+        else if (IsCompatibleTexture(tex, replacement.cachedTexture))
+        {
+            Graphics.CopyTexture(replacement.cachedTexture, tex);
+        }
         else
         {
-            replacement.cachedTextureBytes ??= File.ReadAllBytes(replacement.path);
-            tex.LoadImage(replacement.cachedTextureBytes, tex.isReadable);
+            tex.LoadImage(replacement.cachedBytes);
         }
     }
 
@@ -329,44 +343,6 @@ public class HUDReplacer : MonoBehaviour
     }
     #endregion
 
-    // public void RunMainMenuRefreshSequence()
-    // {
-    //     float[] delays = { 0.5f, 1.2f, 2.0f };
-    //     foreach (float delay in delays)
-    //     {
-    //         this.Invoke(
-    //             () =>
-    //             {
-    //                 Debug.Log($"HUDReplacer: Performing Main Menu refresh ({delay}s).");
-    //                 replacedTextureIds.Clear();
-    //                 idReplacementMap.Clear();
-    //                 RefreshAll();
-    //             },
-    //             delay
-    //         );
-    //     }
-    // }
-
-    // private void ForceGlobalSkin()
-    // {
-    //     // Legacy IMGUI Support
-    //     if (HighLogic.Skin != null)
-    //     {
-    //         ApplySkin(HighLogic.Skin);
-    //     }
-
-    //     // Modern uGUI Support
-    //     if (HighLogic.UISkin != null)
-    //     {
-    //         ApplyUISkinDef(HighLogic.UISkin);
-    //     }
-
-    //     if (UISkinManager.defaultSkin != null)
-    //     {
-    //         ApplyUISkinDef(UISkinManager.defaultSkin);
-    //     }
-    // }
-
     private static SizedReplacementInfo GetMatchingReplacement(
         ReplacementInfo info,
         ReplacementInfo sceneInfo,
@@ -415,5 +391,23 @@ public class HUDReplacer : MonoBehaviour
         cursor.LoadImage(File.ReadAllBytes(value));
         //Cursor.SetCursor(cursor, new Vector2(6,0), CursorMode.ForceSoftware);
         return new TextureCursor() { texture = cursor, hotspot = new Vector2(6, 0) };
+    }
+
+    static bool IsCompatibleTexture(Texture2D a, Texture2D b)
+    {
+        if (a is null || b is null)
+            return false;
+
+        if (a.format != b.format)
+            return false;
+
+        if (a.width != b.width)
+            return false;
+        if (a.height != b.height)
+            return false;
+        if (a.mipmapCount != b.mipmapCount)
+            return false;
+
+        return true;
     }
 }

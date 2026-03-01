@@ -1,9 +1,12 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Networking;
+using UnityEngine.Rendering;
 
 namespace HUDReplacer;
 
@@ -74,7 +77,8 @@ internal static class Database
         public int width;
         public int height;
         public string path;
-        public byte[] cachedTextureBytes;
+        public byte[] cachedBytes;
+        public Texture2D cachedTexture;
         public string basename;
     }
 
@@ -212,8 +216,44 @@ internal static class Database
                 infos.Add(info);
             }
 
-            Parallel.ForEach(infos, info => info.cachedTextureBytes = File.ReadAllBytes(info.path));
+            Parallel.ForEach(infos, info => info.cachedBytes = File.ReadAllBytes(info.path));
+
+            if (SystemInfo.copyTextureSupport != CopyTextureSupport.None)
+            {
+                // We can afford to load texture async in the loading screen, but
+                // when reloading we want them loaded immediately.
+                if (HighLogic.LoadedScene == GameScenes.LOADING)
+                {
+                    foreach (var info in infos)
+                        Loader.Instance.StartCoroutine(LoadTexture(info));
+                }
+                else
+                {
+                    foreach (var info in infos)
+                    {
+                        var tex = new Texture2D(2, 2, TextureFormat.ARGB32, false);
+                        tex.LoadImage(info.cachedBytes);
+                        info.cachedTexture = tex;
+                    }
+                }
+            }
+
             Loaded = true;
         }
+    }
+
+    static IEnumerator LoadTexture(SizedReplacementInfo info)
+    {
+        using var request = UnityWebRequestTexture.GetTexture(new Uri(info.path));
+        yield return request.SendWebRequest();
+
+        if (request.isHttpError || request.isNetworkError)
+            yield break;
+
+        var texture = DownloadHandlerTexture.GetContent(request);
+        if (texture == null)
+            yield break;
+
+        info.cachedTexture = texture;
     }
 }

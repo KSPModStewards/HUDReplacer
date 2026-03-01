@@ -5,12 +5,20 @@ using UnityEngine;
 namespace HUDReplacer;
 
 [KSPAddon(KSPAddon.Startup.Instantly, true)]
-internal class HarmonyPatcher : MonoBehaviour
+internal class Loader : MonoBehaviour
 {
+    internal static Loader Instance { get; private set; }
+
     void Awake()
     {
-        // NOTE: A Harmony patcher should be placed in a run once Startup addon. The patch is kept between scene changes.
+        Instance = this;
+
         var harmony = new Harmony("UltraJohn.Mods.HUDReplacer");
         harmony.PatchAll(Assembly.GetExecutingAssembly());
+    }
+
+    void OnDestroy()
+    {
+        Instance = null;
     }
 }
