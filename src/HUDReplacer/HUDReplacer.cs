@@ -83,7 +83,7 @@ public class HUDReplacer : MonoBehaviour
     void OnLevelGUIReady(GameScenes scene)
     {
         Reset();
-        ReplaceTextures(scene);
+        ReplaceTextures();
     }
 
     // Clear out replace state when a scene gets unloaded so that textures
@@ -111,22 +111,22 @@ public class HUDReplacer : MonoBehaviour
     {
         Reset();
         Database.LoadConfigs();
-        ReplaceTextures(HighLogic.LoadedScene);
+        ReplaceTextures();
     }
 
     #region ReplaceTextures
-    internal void ReplaceTextures(GameScenes scene)
+    internal void ReplaceTextures()
     {
         if (!Database.HasAnyReplacements)
             return;
 
-        using var scope = ReplaceUITexturesMarker.Auto();
+        using var scope = ReplaceTexturesMarker.Auto();
 
         var textures = (Texture2D[])(object)Resources.FindObjectsOfTypeAll(typeof(Texture2D));
         try
         {
             ReplaceQueue.AddRange(textures);
-            ReplaceTextures(ReplaceQueue, scene);
+            ReplaceTexturesImpl(ReplaceQueue);
         }
         finally
         {
@@ -134,10 +134,7 @@ public class HUDReplacer : MonoBehaviour
         }
     }
 
-    internal void ReplaceTexture(Texture2D texture) =>
-        ReplaceTexture(texture, HighLogic.LoadedScene);
-
-    void ReplaceTexture(Texture2D texture, GameScenes scene)
+    internal void ReplaceTexture(Texture2D texture)
     {
         if (!Database.HasAnyReplacements)
             return;
@@ -149,7 +146,7 @@ public class HUDReplacer : MonoBehaviour
         try
         {
             ReplaceQueue.Add(texture);
-            ReplaceTextures(ReplaceQueue, scene);
+            ReplaceTexturesImpl(ReplaceQueue);
         }
         finally
         {
@@ -157,10 +154,21 @@ public class HUDReplacer : MonoBehaviour
         }
     }
 
+    internal void ReplaceTextures(List<Texture2D> textures)
+    {
+        if (!Database.HasAnyReplacements)
+            return;
+
+        using var scope = ReplaceTexturesMarker.Auto();
+        ReplaceTexturesImpl(textures);
+    }
+
     internal void ReplaceTextures(params Span<Texture2D> textures)
     {
         if (!Database.HasAnyReplacements)
             return;
+
+        using var scope = ReplaceTexturesMarker.Auto();
 
         try
         {
@@ -170,7 +178,7 @@ public class HUDReplacer : MonoBehaviour
                     ReplaceQueue.Add(textures[i]);
             }
 
-            ReplaceTextures(ReplaceQueue, HighLogic.LoadedScene);
+            ReplaceTexturesImpl(ReplaceQueue);
         }
         finally
         {
@@ -178,12 +186,12 @@ public class HUDReplacer : MonoBehaviour
         }
     }
 
-    void ReplaceTextures(List<Texture2D> textures, GameScenes scene)
+    void ReplaceTexturesImpl(List<Texture2D> textures)
     {
         if (!Database.HasAnyReplacements)
             return;
 
-        if (!Database.SceneImages.TryGetValue(scene, out var sceneImages))
+        if (!Database.SceneImages.TryGetValue(HighLogic.LoadedScene, out var sceneImages))
             sceneImages = Empty;
 
         foreach (Texture2D tex in textures)
@@ -270,12 +278,12 @@ public class HUDReplacer : MonoBehaviour
         if (!Database.HasAnyReplacements)
             return;
 
-        using var scope = ReplaceTexturesMarker.Auto();
+        using var scope = ReplaceUITexturesMarker.Auto();
 
         try
         {
             FindUITextures(skin, ReplaceQueue);
-            ReplaceTextures(ReplaceQueue, HighLogic.LoadedScene);
+            ReplaceTexturesImpl(ReplaceQueue);
         }
         finally
         {

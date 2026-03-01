@@ -13,11 +13,12 @@ internal static class RoboticControllerWindow_Spawn
     {
         if (!__result)
             return;
-        Image[] image_array = __result.gameObject.GetComponentsInChildren<Image>();
-        List<Texture2D> textures = new List<Texture2D>();
-        foreach (Image img in image_array)
+        var images = __result.gameObject.GetComponentsInChildren<Image>();
+        List<Texture2D> textures = [];
+        foreach (Image img in images)
         {
-            textures.Add((Texture2D)img.mainTexture);
+            var texture = img.mainTexture;
+
             if (
                 img.mainTexture.name == "app_divider_pulldown_header_over"
                 && HUDReplacerColor.KALTitleBar is Color color
@@ -25,9 +26,11 @@ internal static class RoboticControllerWindow_Spawn
             {
                 img.color = color;
             }
+
+            if (texture is Texture2D tex2d)
+                textures.Add(tex2d);
         }
-        Texture2D[] tex_array = textures.ToArray();
-        if (tex_array.Length > 0)
-            HUDReplacer.Instance.ReplaceTextures(tex_array);
+
+        HUDReplacer.Instance.ReplaceTextures(textures);
     }
 }
