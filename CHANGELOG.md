@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+## 1.4.1
+### Fixed
+* Fixed a stock bug that would cause the stage tumblers to always be black, no
+  matter what the override color was within HUDReplacer.
+
 ## 1.4.0
 ### Added
 * The debug tools have been completely rewritten to be a bit more user-friendly.
