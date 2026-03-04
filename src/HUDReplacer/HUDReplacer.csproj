@@ -49,6 +49,10 @@
         <Publicize Include="Assembly-CSharp:UIPartActionResourcePriority.Awake" />
         <Publicize Include="Assembly-CSharp:KSP.UI.UIButtonToggle.Awake" />
         <Publicize Include="Assembly-CSharp:UISkinManager.fetch" />
+        <Publicize Include="Assembly-CSharp:KSP.UI.Screens.Tumbler.positiveColor" />
+        <Publicize Include="Assembly-CSharp:KSP.UI.Screens.Tumbler.negativeColor" />
+        <Publicize Include="Assembly-CSharp:KSP.UI.Screens.Tumbler.tumblerRenderers" />
+        <Publicize Include="Assembly-CSharp:KSP.UI.Screens.Tumbler.tumblerTransforms" />
     </ItemGroup>
 
     <!--
