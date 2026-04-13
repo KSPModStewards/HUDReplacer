@@ -11,6 +11,8 @@ internal static class UIPartActionController_CreatePartUI
 {
     static void Postfix(UIPartActionWindow __result)
     {
+        if (__result == null)
+            return;
         if (HUDReplacerColor.PAWTitleBar is not Color color)
             return;
 
@@ -19,6 +21,9 @@ internal static class UIPartActionController_CreatePartUI
             var images = __result.gameObject.GetComponentsInChildren<Image>();
             foreach (var image in images)
             {
+                if (image.mainTexture == null)
+                    continue;
+
                 if (image.mainTexture.name == "app_divider_pulldown_header_over")
                     image.color = color;
             }
